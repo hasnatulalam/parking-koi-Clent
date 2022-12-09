@@ -4,6 +4,7 @@ import Featured from "../Featured/Featured";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 import ParkingList from "../ParkingList/ParkingList";
+import Reviews from "../ReviewSection/Reviews/Reviews";
 import "./HomePage.css"
 
 
@@ -27,6 +28,7 @@ const HomePage = () => {
       </div>
       
         <About></About>
+        <Reviews></Reviews>
     
         <Contact></Contact>
         <Footer></Footer>

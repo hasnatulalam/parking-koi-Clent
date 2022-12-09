@@ -34,7 +34,7 @@ const Navbar = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get("api/auth/users/logout");
+      const response = await axios.get("http://localhost:9000/api/auth/users/logout");
       if (response.status === 200) {
         alert(response.data.message);
         localStorage.removeItem("auth")

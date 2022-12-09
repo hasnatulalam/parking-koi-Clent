@@ -1,29 +1,18 @@
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-
-import { SearchContext } from "../../context/SearchContext"
-
-
-
 import { useContext, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { SearchContext } from "../../context/SearchContext"
 import useFetch from "../../hooks/useFetch"
 import "./Reserve.css"
 
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
-
-
-
-
 const Reserve = ({ setOpen, parkingSlotId }) => {
   const [selectedRooms, setSelectedRooms] = useState([]);
-
- 
-  
+  const [selectedSlots, setSelectedSlots] = useState([])
+  const [selectedPlace, setSelectedPlace] = useState('')
   
   const { data, loading, error } = useFetch(`http://localhost:9000/api/parking/allParkings/parkingSlot/${parkingSlotId}`);
-  const { dates,options } = useContext(SearchContext);
-  console.log(data)
+  const { dates } = useContext(SearchContext);
 
   const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
     function dayDifference(date1, date2) {
@@ -37,11 +26,7 @@ const Reserve = ({ setOpen, parkingSlotId }) => {
   const getDatesInRange = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
-
-    const date = new Date(start.getTime());
-
-    
-
+    const date = new Date(start.getTime())
     const dates = [];
 
     while (date <= end) {
@@ -63,9 +48,20 @@ const Reserve = ({ setOpen, parkingSlotId }) => {
   };
 
 
-  const handleSelect = (e) => {
+  const handleSelect = (e, slot, place) => {
     const checked = e.target.checked;
     const value = e.target.value;
+    if(checked){
+      const alreadySelectedSlots = [...selectedSlots]
+      if(!alreadySelectedSlots.includes(slot)){
+        setSelectedSlots([...selectedSlots, slot])
+      }
+    }else{
+      const alreadySelectedSlots = [...selectedSlots]
+      const updatedSlots = alreadySelectedSlots.filter(s => s !== slot)
+      setSelectedSlots([...updatedSlots])
+    }
+    setSelectedPlace(place)
     setSelectedRooms(
       checked
         ? [...selectedRooms, value]
@@ -74,22 +70,11 @@ const Reserve = ({ setOpen, parkingSlotId }) => {
     );
   };
   
-
   const navigate = useNavigate();
 
   const handleClick = async () => {
-    try {
-      await Promise.all(
-        selectedRooms.map((parkingSlotId) => {
-          const res = axios.put(`http://localhost:9000/api/parkingSlot/availability/${parkingSlotId}`, {
-            dates: alldates,
-          });
-          return res.data;
-        })
-      );
       setOpen(false);
-      navigate("/pay", {state: {amount: days * data[0]?.price}});
-    } catch (err) {}
+      navigate("/pay", {state: {slots: selectedSlots, amount: days * data[0]?.price, date: dates[0], location: selectedPlace, selectedRooms, alldates, }});
   };
 
   return (
@@ -123,8 +108,7 @@ const Reserve = ({ setOpen, parkingSlotId }) => {
                 <input
                   type="checkbox"
                   value={slotNumber._id}
-         
-                  onChange={handleSelect}
+                  onChange={(e) => handleSelect(e, slotNumber.number, item.title)}
                   disabled={!isAvailable(slotNumber)}
                 />
               </div>

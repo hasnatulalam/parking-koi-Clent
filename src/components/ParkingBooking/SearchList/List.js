@@ -1,33 +1,41 @@
 import "./List.css";
 
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { format } from "date-fns";
 import { DateRange } from "react-date-range";
 import SearchItem from "../SearchItem/SearchItem"
 import useFetch from "../../hooks/useFetch";
+import axios from "axios"
 
 import Header from "../../Home/Header/Header";
 
 
 const List = () => {
   const location = useLocation();
-  const [destination, setDestination] = useState(location.state.destination);
+  const [destination] = useState(location.state.destination);
   const [dates, setDates] = useState(location.state.dates);
   const [openDate, setOpenDate] = useState(false);
   const [options, setOptions] = useState(location.state.options);
-  const [min, setMin] = useState(undefined);
-  const [max, setMax] = useState(undefined);
+  const [min, setMin] = useState(0);
+  const [max, setMax] = useState(0);
+  const [matchedAreas, setMatchedAreas] = useState([])
+  const [dataLoading, setDataLoading] = useState(false)
 
-  const { data, loading, error, reFetch } = useFetch(
-    `http://localhost:9000/api/parking/allParkings?city=${destination}&min=${min || 100 }&max=${max || 3000}`
-    
-  );
-  
-
-  const handleClick = () => {
-    reFetch();
-  };
+  useEffect(() => {
+    const getRelevantSearchArea = async () => {
+      setDataLoading(true)
+        const {data} = await axios.get(`http://localhost:9000/api/parking/AllParkings/${destination}?min=${min}&&max=${max}`)
+        if(data.length){
+          setMatchedAreas(data)
+          setDataLoading(false)
+        }else{
+          setMatchedAreas([])
+          setDataLoading(false)
+        }
+  }
+  getRelevantSearchArea()
+  },[destination, min, max])
 
   return (
     <div>
@@ -81,7 +89,7 @@ const List = () => {
             
              
               <div className="lsOptionItem">
-                <span className="lsOptionText">Room</span>
+                <span className="lsOptionText">Slots</span>
                 <input
                   type="number"
                   min={1}
@@ -91,16 +99,16 @@ const List = () => {
               </div>
             </div>
           </div>
-          <button onClick={handleClick}>Search</button>
+          {/* <button onClick={handleClick}>Search</button> */}
         </div>
         <div className="listResult">
-          {loading ? (
-            "loading"
+          {dataLoading ? (
+            'Loading...'
           ) : (
             <>
-              {data.map((item) => (
+              {matchedAreas.length > 0 ? matchedAreas.map((item) => (
                 <SearchItem item={item} key={item._id} />
-              ))}
+              )) : <h3 className="mt-12 text-2xl text-center text-red-600 font-semibold">No Parking Area Found!</h3>}
             </>
           )}
         </div>
