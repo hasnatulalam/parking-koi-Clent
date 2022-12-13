@@ -14,6 +14,9 @@ import NewParkingSpace from "./components/Owner/NewParkingSpace/NewParkingSpace"
 import Dashboard from "./components/Shared/DashBoard/DashBoard";
 import UserReview from "./components/User/UserReview/UserReview";
 import Booking from "./components/User/MyBooking/MyBooking";
+import AllUsers from "./components/Admin/AllUsers/AllUsers";
+import MakeAdmin from "./components/Admin/MakeAdmin/MakeAdmin";
+import AllParking from "./components/Admin/All Parking Space/AllParking";
 
 
 
@@ -39,8 +42,9 @@ function App() {
           <Route path="/addParking" element={<NewParking/>}/>
           <Route path="/newParkingSpace" element={<NewParkingSpace/>}/>
           <Route path="/review" element={<UserReview/>}/>
-        
-         
+          <Route path="/user" element={<AllUsers/>}/>
+          <Route path="/makeAdmin" element={<MakeAdmin/>}/>
+          <Route path="/AllParking" element={<AllParking/>}/>
     </Routes>
              
        
