@@ -1,11 +1,15 @@
 
 
 
+
+import { DataGrid } from "@mui/x-data-grid";
+import { hotelColumns,  } from "../../Data/DatatableSource";
 import { Link, useLocation } from "react-router-dom";
 import { DeleteOutline } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import axios from "axios";
+import "./AllParking.css"
 
 const AllParking = () => {
  
@@ -13,66 +17,63 @@ const AllParking = () => {
   
 
  
+    const [list, setList] = useState([]);
+  
+
+ 
   
    const { data, loading, error } = useFetch("http://localhost:9000/api/parking/AllParkings");  
  
-  
+
+    useEffect(() => {
+    setList(data);
+   
+  }, [data]);  
 
 
-  const handleDelete = async (_id) => {
+  const handleDelete = async (id) => {
       try {
-       await axios.delete(`http://localhost:9000/api/parking/delete/${_id}`);
-     
+       await axios.delete(`http://localhost:9000/api/parking/delete/${id}`);
+       setList(list.filter((item) => item._id !== id)); 
       
     } catch (err) {}   
    
-  }; 
-
+  };
  
-  return (
-    <div className="shadow rounded-xl">
-   
-    <h2 className="text-2xl font-bold pt-4 pl-10 mb-2">All Users</h2>
-    <hr className="border-[#21252c] h-[1px] mb-6" />
-    <div class="overflow-x-auto">
-        <table class="table w-full">
-            <thead>
-                <tr className="text-black">
-                    <th></th>
-                    <th>Name</th>
-                    <th>City</th>
-                    <th>Address</th>
-                    <th>Slots</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody className="text-black">
-                {data.map((parking, index) => (
-                    <tr>
-                        <th>{index + 1}</th>
-                        <td>{parking.name}</td>
-                        <td>{parking.city}</td>
-                        <td>{parking.address}</td>
-                       
-                        <td>
-                       
-                                <button
-                                    onClick={() => handleDelete(parking._id)}
-                                    className="btn btn-error btn-xs"
-                                >
-                                    Remove User
-                                </button>
-                     
-                            
-                        </td>
-
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
-</div>
-  );
+   const actionColumn = [
+     {
+       field: "action",
+       headerName: "Action",
+       width: 200,
+       renderCell: (params) => {
+         return (
+           <div className="cellAction">
+           
+             <div
+               className="deleteButton"
+               onClick={() => handleDelete(params.row._id)}
+             >
+               Delete
+             </div>
+           </div>
+         );
+       },
+     },
+   ];
+   return (
+     <div className="datatable">
+      
+       <DataGrid
+         className="datagrid"
+         rows={list}
+         columns={hotelColumns.concat(actionColumn)}
+         pageSize={9}
+         rowsPerPageOptions={[9]}
+         checkboxSelection
+          getRowId={(row) => row._id} 
+       />
+     </div>
+   );
 };
 
 export default AllParking;
