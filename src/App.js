@@ -17,6 +17,7 @@ import Booking from "./components/User/MyBooking/MyBooking";
 import AllUsers from "./components/Admin/AllUsers/AllUsers";
 import MakeAdmin from "./components/Admin/MakeAdmin/MakeAdmin";
 import AllParking from "./components/Admin/All Parking Space/AllParking";
+import AllParkingSlot from "./components/Admin/AllParkingSlot/AllParkingSlot";
 
 
 
@@ -45,6 +46,7 @@ function App() {
           <Route path="/user" element={<AllUsers/>}/>
           <Route path="/makeAdmin" element={<MakeAdmin/>}/>
           <Route path="/AllParking" element={<AllParking/>}/>
+          <Route path="/AllParkingSlot" element={<AllParkingSlot/>}/>
     </Routes>
              
        

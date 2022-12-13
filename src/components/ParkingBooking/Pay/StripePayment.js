@@ -18,7 +18,7 @@ const appearance = {
   
 
 const StripePayment = () => {
-    const {state: {amount}} = useLocation()
+    const {state: {slots, amount, date, location, selectedRooms, alldates}} = useLocation()
     const [clientSecret, setClientSecret] = useState('')
     const options = {clientSecret, appearance};
     const [state] = useContext(UserContext)
@@ -43,7 +43,16 @@ const StripePayment = () => {
                 { 
                     clientSecret && 
                     <Elements stripe={stripePromise} options={options}>
-                        <CheckoutForm alias={name} amount={amount} user={_id} />
+                        <CheckoutForm 
+                            alias={name} 
+                            slots={slots} 
+                            amount={amount} 
+                            user={_id} 
+                            date={date} 
+                            location={location} 
+                            selectedRooms={selectedRooms} 
+                            alldates={alldates}
+                        />
                     </Elements>
                 }
         </div>
@@ -51,7 +60,7 @@ const StripePayment = () => {
 }
 
 
-const CheckoutForm = ({ alias, amount, user }) => {
+const CheckoutForm = ({ alias, slots, amount, user, date, location, selectedRooms, alldates }) => {
     const stripe = useStripe()
     const elements = useElements()
     const [cardErr, setCardErr] = useState('')
@@ -83,8 +92,12 @@ const CheckoutForm = ({ alias, amount, user }) => {
             setCardErr(intentErr?.message)
             setPaymentLoading(false)
         } else {
-            const {data} = await axios.post('http://localhost:9000/api/payment', {trxId: paymentIntent.id, user})
+            const {data} = await axios.post('http://localhost:9000/api/payment', {trxId: paymentIntent.id, user, date, location, slots})
             if(data?.success){
+                await Promise.all(selectedRooms.map((parkingSlotId) => 
+                        axios.put(`http://localhost:9000/api/parkingSlot/availability/${parkingSlotId}`, {
+                        dates: alldates,
+                      })));
                 setTransactionId(paymentIntent.id)
                 setPaymentLoading(false)
             }

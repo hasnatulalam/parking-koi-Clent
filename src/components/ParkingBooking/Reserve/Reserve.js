@@ -74,7 +74,7 @@ const Reserve = ({ setOpen, parkingSlotId }) => {
 
   const handleClick = async () => {
       setOpen(false);
-      navigate("/pay", {state: {slots: selectedSlots, amount: days * data[0]?.price, date: dates[0], location: selectedPlace, selectedRooms, alldates, }});
+      navigate("/pay", {state: {slots: selectedSlots, amount: days * data[0]?.price, date: dates[0], location: selectedPlace,  selectedRooms, alldates  }});
   };
 
   return (
